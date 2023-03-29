@@ -24,7 +24,7 @@ window.onload = function(){
         .attr("class", "innerRect") //class name
         .attr("x", 50) //position from left on the x (horizontal) axis
         .attr("y", 50) //position from top on the y (vertical) axis
-        .style("fill", "white"); //fill color
+        .style("fill", "beige"); //fill color
 
     //week 2 data    
     var cityPop = [
@@ -68,8 +68,8 @@ window.onload = function(){
     //color scale generator 
     var color = d3.scaleLinear()
         .range([
-            "#FDBE85",
-            "#D94701"
+            "yellow",
+            "purple"
         ])//set a color scheme for data values
         .domain([
             minPop, 
@@ -120,7 +120,7 @@ window.onload = function(){
 
         //Example 3.14 line 1...create circle labels
     var labels = container.selectAll(".labels")
-        .data(cityPop)
+        .data(cityPop)//call data from week 2
         .enter()
         .append("text")
         .attr("class", "labels")
