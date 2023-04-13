@@ -18,6 +18,7 @@ function setMap(){
         .rotate([0, 0, 0])
         .parallels([20 , 50])
         .scale(1750)
+        .angle(50)
         .translate([width / 2, height / 2]);
 
     var path = d3.geoPath()
@@ -36,15 +37,24 @@ function callback(data){
     var csvData = data[0],
         basemap = data[1];
 
-    var spatialFile = topojson.feature(basemap, basemap.objects.exportsample);
+    var spatialFile = topojson.feature(basemap, basemap.objects.exportsample).features;
     //console.log(data)
 
     //add three us regions to map
-    var states = map.append("path")
+   /*var states = map.append("path")
         .datum(spatialFile)
         .attr("class", "NAME")
-        .attr("d", path);
+        .attr("d", path);*/
+
+       //add France regions to map
+       var regions = map.selectAll(".regions")
+       .data(spatialFile)
+       .enter()
+       .append("path")
+       .attr("class", function(d){
+           return "NAME " + d.properties.State;
+       })
+       .attr("d", path);
 }
 
 }
-
