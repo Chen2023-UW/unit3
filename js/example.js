@@ -1,5 +1,7 @@
 window.onload = setMap();
 //original projection is wgs-1984
+//a few consideration: 1. add lower 48 states as basemap? Worry: Alaska and Hawaii. 2. change projection to WGS1984.
+
 
 function setMap(){
     //set map frame
