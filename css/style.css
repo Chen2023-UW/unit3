@@ -16,7 +16,7 @@
 
 .regions {
     fill: sandybrown;
-    stroke:black;
+    stroke:whitesmoke;
     stroke-width: 0.5px;
 }
 
@@ -31,19 +31,19 @@
 }
 
 .chartTitle {
-    font-family: sans-serif;
+    font-family: serif;
     font-size: 1.5em;
-    font-weight: bold;
+    font-weight: medium;
 }
 
 .chartBackground {
-    fill: rgba(128,128,128,.2);
+    fill: whitesmoke;
 }
 
 .chartFrame {
     fill: none;
     stroke: #999;
-    stroke-width: 3px;
+    stroke-width: 1px;
     shape-rendering: crispEdges;
 }
 

@@ -5,7 +5,7 @@
 
 	//pseudo-global variables
     //original topojson have more attribute beyond those seven
-    var attrArray = ["ALAND", "AWATER", "Total_Manu", "Manufactur", "Manufact_1","Average_An","Manufact_2"]; 
+    var attrArray = ["TotalManufacturingOutput", "ManufacturingFirms", "ManufacturingEmployment","AverageAnnualCompensation","ManufacturedGoodsExports"]; 
 	var expressed = attrArray[0]; //initial attribute
 
 
@@ -40,8 +40,8 @@
 
 	    //use Promise.all to parallelize asynchronous data loading
 	    var promises = [d3.csv("data/lab2stats.csv"),
-	                    d3.json("data/spatialfile.topojson")
-	                   ];
+	                    d3.json("data/spatialfile.topojson")];
+
 	    Promise.all(promises).then(callback);
 
 	    function callback(data){
@@ -86,13 +86,12 @@
 	function makeColorScale(data){
 
 		var colorClasses = [
-	        "#D4B9DA",
-	        "#C994C7",
-	        "#DF65B0",
-	        "#DD1C77",
-	        "#980043"
+	        "#D1A841",//yellow sand
+            "#6c9e5d",//light green
+	        "#91711F",//dark yellow
+            "#6B5316",//orange brown
+	        "#45350E"//brown
 	    ];
-        //note: every color on default d4b9da, the color scale applied in error
 
 	    //create color scale generator
 	    var colorScale = d3.scaleQuantile()
@@ -118,7 +117,7 @@ function setEnumerationUnits(americastates,map,path,colorScale){
         .enter()
         .append("path")
         .attr("class", function(d){
-            return "regions " + d.properties.Manufactur;
+            return "regions " + d.properties.ManufacturingEmployment;
         })
         .attr("d", path)
         .style("fill", function(d){
@@ -160,8 +159,8 @@ function setChart(csvData, colorScale){
 
     //create a scale to size bars proportionally to frame and for axis
     var yScale = d3.scaleLinear()
-        .range([463, 0])
-        .domain([0, 100]);
+        .range([405, 0])
+        .domain([0, 200]);
 
     //set bars for each province
     var bars = chart.selectAll(".bar")
@@ -172,7 +171,7 @@ function setChart(csvData, colorScale){
             return b[expressed]-a[expressed]
         })
         .attr("class", function(d){
-            return "bar " + d.Manufactur;
+            return "bar " + d.ManufacturingEmployment;
         })
         .attr("width", chartInnerWidth / csvData.length - 1)
         .attr("x", function(d, i){
@@ -193,7 +192,7 @@ function setChart(csvData, colorScale){
         .attr("x", 40)
         .attr("y", 40)
         .attr("class", "chartTitle")
-        .text("Amount of " + expressed[1] + " in each state");
+        .text("Amount of " + expressed + " in each state");
 
     //create vertical axis generator
     var yAxis = d3.axisLeft()

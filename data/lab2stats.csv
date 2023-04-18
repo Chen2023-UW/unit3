@@ -1,4 +1,4 @@
-ID,State,"Total Manufacturing Output ($billions, 2021)",Manufacturing Firms (2019),Manufacturing Employment (December 2021),"Average Annual Compensation (Manufacturing, 2021)","Manufactured Goods Exports ($billions, 2021)"
+ID,State,"TotalManufacturingOutput","ManufacturingFirms","ManufacturingEmployment","AverageAnnualCompensation","ManufacturedGoodsExports"
 1,CT,34.88,3698,156000,105744,13.55
 2,IA,38.56,2891,225000,79356,13.26
 3,IL,114.73,11806,557000,97323,62.21
