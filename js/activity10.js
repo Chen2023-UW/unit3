@@ -118,11 +118,12 @@ function setEnumerationUnits(americastates,map,path,colorScale){
         .enter()
         .append("path")
         .attr("class", function(d){
-            return "regions " + d.properties.State;
+            return "regions " + d.properties.Manufactur;
         })
         .attr("d", path)
         .style("fill", function(d){
             var value = d.properties[expressed];
+            //change on property varible name do not effect on live server, hint the issue on expressed 
             if(value) {
             	return colorScale(d.properties[expressed]);
             } else {
@@ -171,7 +172,7 @@ function setChart(csvData, colorScale){
             return b[expressed]-a[expressed]
         })
         .attr("class", function(d){
-            return "bar " + d.State;
+            return "bar " + d.Manufactur;
         })
         .attr("width", chartInnerWidth / csvData.length - 1)
         .attr("x", function(d, i){
