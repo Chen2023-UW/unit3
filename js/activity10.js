@@ -16,8 +16,8 @@
 	function setMap(){
 
 	    //map frame dimensions
-    	var width = 760,
-        height = 600;
+    	var width = 765,
+        height = 450;
 
 	    //create new svg container for the map
 	    var map = d3.select("body")
@@ -86,8 +86,9 @@
 	function makeColorScale(data){
 
 		var colorClasses = [
-	        "#D1A841",//yellow sand
+	        
             "#6c9e5d",//light green
+            "#D1A841",//yellow sand
 	        "#91711F",//dark yellow
             "#6B5316",//orange brown
 	        "#45350E"//brown
@@ -117,7 +118,7 @@ function setEnumerationUnits(americastates,map,path,colorScale){
         .enter()
         .append("path")
         .attr("class", function(d){
-            return "regions " + d.properties.ManufacturingEmployment;
+            return "regions " + d.properties.State;
         })
         .attr("d", path)
         .style("fill", function(d){
@@ -171,7 +172,7 @@ function setChart(csvData, colorScale){
             return b[expressed]-a[expressed]
         })
         .attr("class", function(d){
-            return "bar " + d.ManufacturingEmployment;
+            return "bar " + d.State;
         })
         .attr("width", chartInnerWidth / csvData.length - 1)
         .attr("x", function(d, i){
@@ -181,7 +182,7 @@ function setChart(csvData, colorScale){
             return 400 - yScale(parseFloat(d[expressed]));
         })
         .attr("y", function(d, i){
-            return yScale(parseFloat(d[expressed])) + topBottomPadding;
+            return yScale(parseFloat(d[expressed])) - topBottomPadding;
         })
         .style("fill", function(d){
             return colorScale(d[expressed]);
