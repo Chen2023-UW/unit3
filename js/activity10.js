@@ -1,7 +1,7 @@
 //wrap everything is immediately invoked anonymous function so nothing is in global scope
-//consider change projection type
 //consider equal display quality on different platform
 //consider nail employment from people to thousand people. Error when nail it down in csv. 
+//problem: hightlight and dehilight field, automatic y-axis
 
 (function (){
 
@@ -14,7 +14,7 @@
     //chart frame dimensions:
     var chartWidth = window.innerWidth * 0.425,
         chartHeight = 400,
-        leftPadding = 25,
+        leftPadding = 50,
         rightPadding = 2,
         topBottomPadding = 5,
         chartInnerWidth = chartWidth - leftPadding - rightPadding,
@@ -25,7 +25,7 @@
     //create a scale to size bars proportionally to frame and for axis
     var yScale = d3.scaleLinear()
         .range([405, 0])
-        .domain([0, 200]);    
+        .domain([0, 150]);    
 
 
 	//begin script when window loads
@@ -167,7 +167,7 @@ function setEnumerationUnits(americastates,map,path,colorScale){
     })
     .on("mousemove", moveLabel);
 
-    var desc = regions.append("desc").text('{"stroke": "#000", "stroke-width": "0.25px" }');
+    var desc = regions.append("desc").text('{"stroke": "#fff", "stroke-width": "0.25px" }');
 }
 
 //function to create coordinated bar chart
@@ -224,9 +224,10 @@ function setChart(csvData, colorScale){
             return colorScale(d[expressed]);
         });
 
+    var bars = bars.append("desc").text('{"stroke": "none", "stroke-width": "0px"}');
     //create a text element for the chart title
     var chartTitle = chart.append("text")
-        .attr("x", 40)
+        .attr("x", 60)
         .attr("y", 40)
         .attr("class", "chartTitle")
         .text("Amount of " + expressed + " in each state");
@@ -257,7 +258,7 @@ function setChart(csvData, colorScale){
         .attr("class","dropdown")
         .on("change",function(){
             changeAttribute(this.value, csvData);
-        });
+        });    
 
         //add initial option
         var titleOption = dropdown
@@ -309,6 +310,23 @@ function setChart(csvData, colorScale){
             })
             .duration(500);
 
+        var domainArray = [];
+            for (var i=0; i<csvData.length; i++){
+                var val = parseFloat(csvData[i][expressed]);
+                domainArray.push(val);
+            };
+        var max = d3.max(domainArray)
+
+        yScale = d3.scaleLinear()
+        .range([405, 0])
+        .domain([0, max + (max/5)]); 
+
+         //create vertical axis generator
+        var yAxis = d3.axisLeft()
+        .scale(yScale);
+
+        d3.select(".axis").call(yAxis)
+
         updateChart(bars, csvData.length, colorScale);
 
     }
@@ -345,7 +363,7 @@ function setChart(csvData, colorScale){
     function highlight(props) {
         //change stroke
         var selected = d3
-            .selectAll("." + props.NAME)
+            .selectAll("." + props.State)
             .style("stroke", "blue")
             .style("stroke-width", "2");
         setLabel(props);
@@ -353,8 +371,9 @@ function setChart(csvData, colorScale){
 
     //function to reset the element style on mouseout
     function dehighlight(props) {
+
         var selected = d3
-            .selectAll("." + props.NAME)
+            .selectAll("." + props.State)
             .style("stroke", function () {
                 return getStyle(this, "stroke");
             })
@@ -363,6 +382,7 @@ function setChart(csvData, colorScale){
             });
 
         function getStyle(element, styleName) {
+            console.log(d3.select(element).select("desc"))
             var styleText = d3.select(element).select("desc").text();
 
             var styleObject = JSON.parse(styleText);
