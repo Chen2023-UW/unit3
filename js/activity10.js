@@ -1,7 +1,4 @@
 //wrap everything is immediately invoked anonymous function so nothing is in global scope
-//consider equal display quality on different platform
-//consider nail employment from people to thousand people. Error when nail it down in csv. 
-//problem: hightlight and dehilight field, automatic y-axis
 
 (function (){
 
