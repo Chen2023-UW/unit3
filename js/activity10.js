@@ -1,6 +1,6 @@
 //wrap everything is immediately invoked anonymous function so nothing is in global scope
-//consideration: change projection type
-//topojson ready, waiting on introduce.
+//consider change projection type
+//consider equal display quality on different platform
 
 (function (){
 
@@ -8,6 +8,23 @@
     //original topojson have more attribute beyond those seven
     var attrArray = ["TotalManufacturingOutput", "ManufacturingFirms", "ManufacturingEmployment","AverageAnnualCompensation","ManufacturedGoodsExports"]; 
 	var expressed = attrArray[0]; //initial attribute
+
+    //move chart to here:
+    //chart frame dimensions:
+    var chartWidth = window.innerWidth * 0.425,
+        chartHeight = 400,
+        leftPadding = 25,
+        rightPadding = 2,
+        topBottomPadding = 5,
+        chartInnerWidth = chartWidth - leftPadding - rightPadding,
+        chartInnerHeight = chartHeight - topBottomPadding * 2,
+        translate = "translate(" + leftPadding + "," + topBottomPadding + ")";
+
+
+    //create a scale to size bars proportionally to frame and for axis
+    var yScale = d3.scaleLinear()
+        .range([405, 0])
+        .domain([0, 200]);    
 
 
 	//begin script when window loads
@@ -68,7 +85,7 @@
         	setChart(csvData, colorScale);
 
             //add drop down
-            createDropdown()
+            createDropdown(csvData);
 
 	    };
 
@@ -140,20 +157,20 @@ function setEnumerationUnits(americastates,map,path,colorScale){
             } else {
             	return "#ccc";
             }
-    });
+    })
+    .on("mouseover",function(event,d){
+        highlight(d.properties);
+    })
+    .on("mouseout",function (event,d){
+        dehighlight(d.properties);
+    })
+    .on("mousemove", moveLabel);
+
+    var desc = regions.append("desc").text('{"stroke": "#000", "stroke-width": "0.25px" }');
 }
 
 //function to create coordinated bar chart
 function setChart(csvData, colorScale){
-    //chart frame dimensions
-    var chartWidth = window.innerWidth * 0.425,
-        chartHeight = 400,
-        leftPadding = 25,
-        rightPadding = 2,
-        topBottomPadding = 5,
-        chartInnerWidth = chartWidth - leftPadding - rightPadding,
-        chartInnerHeight = chartHeight - topBottomPadding * 2,
-        translate = "translate(" + leftPadding + "," + topBottomPadding + ")";
 
     //create a second svg element to hold the bar chart
     var chart = d3.select("body")
@@ -170,12 +187,10 @@ function setChart(csvData, colorScale){
         .attr("transform", translate);
 
     //create a scale to size bars proportionally to frame and for axis
-    var yScale = d3.scaleLinear()
-        .range([405, 0])
-        .domain([0, 200]);
 
     //set bars for each province
-    var bars = chart.selectAll(".bar")
+    var bars = chart
+        .selectAll(".bar")
         .data(csvData)
         .enter()
         .append("rect")
@@ -186,6 +201,15 @@ function setChart(csvData, colorScale){
             return "bar " + d.State;
         })
         .attr("width", chartInnerWidth / csvData.length - 1)
+
+        .on("mouseover",function(event,d){
+            highlight(d);
+        })
+        .on("mouseout",function (event,d){
+            dehighlight(d);
+        })
+        .on("mousemove", moveLabel)
+
         .attr("x", function(d, i){
             return i * (chartInnerWidth / csvData.length) + leftPadding;
         })
@@ -231,7 +255,7 @@ function setChart(csvData, colorScale){
         .append("select")
         .attr("class","dropdown")
         .on("change",function(){
-            changeAttrivute(this.value, csvData)
+            changeAttribute(this.value, csvData);
         });
 
         //add initial option
@@ -247,7 +271,7 @@ function setChart(csvData, colorScale){
             .data(attrArray)
             .enter()
             .append("option")
-            attr("value", function (d){
+            .attr("value", function (d){
                 return d;
             })    
             .text(function (d){
@@ -256,7 +280,7 @@ function setChart(csvData, colorScale){
     }
 
     //dropdown change event listener
-    function changeAttrivute(attribute, csvData){
+    function changeAttribute(attribute, csvData){
         //change expressed attribute
         expressed = attribute;
 
@@ -272,7 +296,118 @@ function setChart(csvData, colorScale){
                 return "#ccc";
             }
         });
+
+        //recolor bars
+        var bars = d3.selectAll(".bar")
+            .sort(function(a,b){
+                return b[expressed] - a[expressed];
+            })
+            .transition()
+            .delay(function(d,i){
+                return i * 20;
+            })
+            .duration(500);
+
+        updateChart(bars, csvData.length, colorScale);
+
     }
 
+    function updateChart(bars, n, colorScale) {
+        //position bars
+        bars.attr("x", function (d, i) {
+            return i * (chartInnerWidth / n) + leftPadding;
+        })
+            //size/resize bars
+            .attr("height", function (d, i) {
+                return 400 - yScale(parseFloat(d[expressed]));
+            })
+            .attr("y", function (d, i) {
+                return yScale(parseFloat(d[expressed])) - topBottomPadding;
+            })
+            //color/recolor bars
+            .style("fill", function (d) {
+                var value = d[expressed];
+                if (value) {
+                    return colorScale(value);
+                } else {
+                    return "#ccc";
+                }
+            });
+
+        //at the bottom of updateChart()...add text to chart title
+        var chartTitle = d3
+            .select(".chartTitle")
+            .text("Amount of " + expressed + " in each state");
+    }
+
+    //function to highlight enumeration units and bars
+    function highlight(props) {
+        //change stroke
+        var selected = d3
+            .selectAll("." + props.State)
+            .style("stroke", "blue")
+            .style("stroke-width", "2");
+        setLabel(props);
+    }
+
+    //function to reset the element style on mouseout
+    function dehighlight(props) {
+        var selected = d3
+            .selectAll("." + props.State)
+            .style("stroke", function () {
+                return getStyle(this, "stroke");
+            })
+            .style("stroke-width", function () {
+                return getStyle(this, "stroke-width");
+            });
+
+        function getStyle(element, styleName) {
+            var styleText = d3.select(element).select("desc").text();
+
+            var styleObject = JSON.parse(styleText);
+
+            return styleObject[styleName];
+        }
+        //remove info label
+        d3.select(".infolabel").remove();
+    }
+
+    //function to create dynamic label
+    function setLabel(props) {
+        console.log("here!");
+        //label content
+        var labelAttribute = "<h1>" + props[expressed] + "</h1><b>" + expressed + "</b>";
+
+        //create info label div
+        var infolabel = d3
+            .select("body")
+            .append("div")
+            .attr("class", "infolabel")
+            .attr("id", props.State + "_label")
+            .html(labelAttribute);
+
+        var regionName = infolabel.append("div").attr("class", "labelname").html(props.State);
+    }
+
+    //function to move info label with mouse
+    function moveLabel() {
+        //get width of label
+        var labelWidth = d3.select(".infolabel").node().getBoundingClientRect().width;
+
+        //use coordinates of mousemove event to set label coordinates
+        var x1 = event.clientX + 10,
+            y1 = event.clientY - 75,
+            x2 = event.clientX - labelWidth - 10,
+            y2 = event.clientY + 25;
+
+        //horizontal label coordinate, testing for overflow
+        var x = event.clientX > window.innerWidth - labelWidth - 20 ? x2 : x1;
+        //vertical label coordinate, testing for overflow
+        var y = event.clientY < 75 ? y2 : y1;
+
+        d3.select(".infolabel")
+            .style("left", x + "px")
+            .style("top", y + "px");
+    }
 
 })();
