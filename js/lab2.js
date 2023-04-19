@@ -1,13 +1,11 @@
 //wrap everything is immediately invoked anonymous function so nothing is in global scope
-
 (function (){
-
 	//pseudo-global variables
-    //original topojson have more attribute beyond those seven
+    //topojson file and csv file ready to display
     var attrArray = ["TotalManufacturingOutput", "ManufacturingFirms", "ManufacturingEmployment","AverageAnnualCompensation","ManufacturedGoodsExports"]; 
 	var expressed = attrArray[0]; //initial attribute
 
-    //move chart to here:
+    //local chart to here:
     //chart frame dimensions:
     var chartWidth = window.innerWidth * 0.425,
         chartHeight = 400,
@@ -18,16 +16,13 @@
         chartInnerHeight = chartHeight - topBottomPadding * 2,
         translate = "translate(" + leftPadding + "," + topBottomPadding + ")";
 
-
     //create a scale to size bars proportionally to frame and for axis
     var yScale = d3.scaleLinear()
         .range([405, 0])
         .domain([0, 150]);    
 
-
 	//begin script when window loads
 	window.onload = setMap();
-
 
 	function setMap(){
 
@@ -84,10 +79,8 @@
 
             //add drop down
             createDropdown(csvData);
-
 	    };
 
-	    
 	};
 
 	function setGraticule(map,path){
@@ -112,8 +105,7 @@
 
 	function makeColorScale(data){
 
-		var colorClasses = [
-	        
+		var colorClasses = [    
             "#6c9e5d",//light green
             "#D1A841",//yellow sand
 	        "#91711F",//dark yellow
@@ -246,7 +238,7 @@ function setChart(csvData, colorScale){
         .attr("height", chartInnerHeight)
         .attr("transform", translate);
 };
-    
+
     //function to create dropdown menu
     function createDropdown(csvData){
         //add select element
@@ -318,14 +310,13 @@ function setChart(csvData, colorScale){
         .range([405, 0])
         .domain([0, max + (max/5)]); 
 
-         //create vertical axis generator
+        //create vertical axis generator
         var yAxis = d3.axisLeft()
         .scale(yScale);
 
         d3.select(".axis").call(yAxis)
 
         updateChart(bars, csvData.length, colorScale);
-
     }
 
     function updateChart(bars, n, colorScale) {
@@ -427,5 +418,4 @@ function setChart(csvData, colorScale){
             .style("left", x + "px")
             .style("top", y + "px");
     }
-
 })();
