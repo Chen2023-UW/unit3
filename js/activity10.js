@@ -1,5 +1,6 @@
 //wrap everything is immediately invoked anonymous function so nothing is in global scope
-//consideration: change projection type, add all 48 states as basemap
+//consideration: change projection type
+//topojson ready, waiting on introduce.
 
 (function (){
 
@@ -40,16 +41,24 @@
 
 	    //use Promise.all to parallelize asynchronous data loading
 	    var promises = [d3.csv("data/lab2stats.csv"),
-	                    d3.json("data/spatialfile.topojson")];
+	                d3.json("data/spatialfile.topojson"),
+                    d3.json("data/basemap.topojson")];
 
 	    Promise.all(promises).then(callback);
 
 	    function callback(data){
-			var csvData = data[0], america = data[1];
+			var csvData = data[0], america = data[1], canvas = data[2];
 	        setGraticule(map,path);
 
 	        //translate europe TopoJSON
 	        var americastates = topojson.feature(america, america.objects.exportsample).features;
+            var canvas = topojson.feature(canvas, canvas.objects.basemap);
+
+            var country = map
+                .append("path")
+                .datum(canvas)
+                .attr("class", "country")
+                .attr("d", path);
 
 	        var colorScale = makeColorScale(csvData);
 
@@ -57,6 +66,9 @@
 
 	        //add coordinated visualization to the map
         	setChart(csvData, colorScale);
+
+            //add drop down
+            createDropdown()
 
 	    };
 
@@ -123,7 +135,6 @@ function setEnumerationUnits(americastates,map,path,colorScale){
         .attr("d", path)
         .style("fill", function(d){
             var value = d.properties[expressed];
-            //change on property varible name do not effect on live server, hint the issue on expressed 
             if(value) {
             	return colorScale(d.properties[expressed]);
             } else {
@@ -212,5 +223,56 @@ function setChart(csvData, colorScale){
         .attr("height", chartInnerHeight)
         .attr("transform", translate);
 };
+    
+    //function to create dropdown menu
+    function createDropdown(csvData){
+        //add select element
+        var dropdown = d3.select("body")
+        .append("select")
+        .attr("class","dropdown")
+        .on("change",function(){
+            changeAttrivute(this.value, csvData)
+        });
+
+        //add initial option
+        var titleOption = dropdown
+            .append("option")
+            .attr("class","titleOption")
+            .attr("disabled","true")
+            .text("Select Attribute");
+
+        //add attribute name options
+        var attrOptions = dropdown
+            .selectAll("attrOptions")
+            .data(attrArray)
+            .enter()
+            .append("option")
+            attr("value", function (d){
+                return d;
+            })    
+            .text(function (d){
+                return d;
+            });
+    }
+
+    //dropdown change event listener
+    function changeAttrivute(attribute, csvData){
+        //change expressed attribute
+        expressed = attribute;
+
+        //recreate color
+        var colorScale = makeColorScale(csvData);
+
+        //recolor enumeration units
+        var regions = d3.selectAll(".regions").style("fill",function (d){
+            var value  = d.properties[expressed];
+            if(value) {
+                return colorScale(d.properties[expressed]);
+            } else {
+                return "#ccc";
+            }
+        });
+    }
+
 
 })();

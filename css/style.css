@@ -57,6 +57,26 @@
 
 .axis text {
     font-family: sans-serif;
-    font-size: 0.8em;
-    fill: #999;
+    font-size: 0.9 em;
+    fill: darkred;
+}
+
+.dropdown {
+    font-size: 1em;
+    font-weight: medium;
+    font-family: serif;
+    padding: 2px;
+    border: 0.5px solid black;
+    box-shadow: 2px 2px 2px;
+
+}
+
+option {
+    font-weight: normal;
+}
+
+.country {
+    fill:#faf7d4;
+    stroke: grey;
+    stroke-width: 0.25px;
 }
