@@ -1,6 +1,7 @@
 //wrap everything is immediately invoked anonymous function so nothing is in global scope
 //consider change projection type
 //consider equal display quality on different platform
+//consider nail employment from people to thousand people. Error when nail it down in csv. 
 
 (function (){
 
@@ -344,7 +345,7 @@ function setChart(csvData, colorScale){
     function highlight(props) {
         //change stroke
         var selected = d3
-            .selectAll("." + props.State)
+            .selectAll("." + props.NAME)
             .style("stroke", "blue")
             .style("stroke-width", "2");
         setLabel(props);
@@ -353,7 +354,7 @@ function setChart(csvData, colorScale){
     //function to reset the element style on mouseout
     function dehighlight(props) {
         var selected = d3
-            .selectAll("." + props.State)
+            .selectAll("." + props.NAME)
             .style("stroke", function () {
                 return getStyle(this, "stroke");
             })
@@ -383,7 +384,7 @@ function setChart(csvData, colorScale){
             .select("body")
             .append("div")
             .attr("class", "infolabel")
-            .attr("id", props.State + "_label")
+            .attr("id", props.NAME + "_label")
             .html(labelAttribute);
 
         var regionName = infolabel.append("div").attr("class", "labelname").html(props.NAME);
